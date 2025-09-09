@@ -18,7 +18,6 @@ tasks:
     cmds:
       - "uv sync"
       - "docker compose up -d --wait postgres"
-      - "{{.RUNNER}} alembic upgrade head"
       - "docker compose down"
 
   run:
@@ -30,14 +29,10 @@ tasks:
       - "{{.RUNNER}} alembic upgrade head"
       - "{{.RUNNER}} fastapi dev src/dev.py"
 
-  upgrade-db:
-    desc: Initialize local database
-    env:
-      ENV: local
+  build:
+    desc: Build the application for production
     cmds:
-      - "docker compose up -d --wait postgres"
-      - "{{.RUNNER}} alembic upgrade head"
-      - "docker compose down"
+      - "docker compose -f docker-compose.yml up -d --build"
   
   makemigrations:
     desc: Create initial database migrations

@@ -136,7 +136,7 @@ async def fake_jwt_token(client: AsyncClient) -> str:
         },
     )
     await client.post(
-        "/api/v1/auth/confirm",
+        "/api/v1/auth/verify",
         json={
             "email": email,
             "code": "1111",

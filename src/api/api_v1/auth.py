@@ -51,7 +51,7 @@ async def signup(crud: Annotated[UserCRUD, Depends(get_user_crud)], payload: Use
 
 
 @router.post(
-    "/confirm",
+    "/verify",
     response_model=None,
     status_code=status.HTTP_200_OK,
     summary="Confirm email",

@@ -131,3 +131,9 @@ template_project
 └── tests  # Tests for project.
     └── conftest.py  # Fixtures for all tests.
 ```
+
+## Run project
+```bash
+task init
+task build
+```

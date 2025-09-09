@@ -47,7 +47,7 @@ async def test_login_returns_200_and_tokens(client: AsyncClient) -> None:
 
     # 2. Confirm user
     confirm_payload = {"email": "test@example.com", "code": "1111"}
-    response = await client.post("/api/v1/auth/confirm", json=confirm_payload)
+    response = await client.post("/api/v1/auth/verify", json=confirm_payload)
     assert response.status_code == 200
 
     # 3. Login with correct credentials
@@ -74,7 +74,7 @@ async def test_refresh_returns_200_and_new_access_token(client: AsyncClient) -> 
 
     # Confirm user
     confirm_payload = {"email": "refresh@example.com", "code": "1111"}
-    response = await client.post("/api/v1/auth/confirm", json=confirm_payload)
+    response = await client.post("/api/v1/auth/verify", json=confirm_payload)
     assert response.status_code == 200
 
     # Login and get refresh token
