@@ -33,6 +33,11 @@ tasks:
     desc: Build the application for production
     cmds:
       - "docker compose -f docker-compose.yml up -d --build"
+
+  down:
+    desc: Stop the application and remove containers
+    cmds:
+      - "docker compose -f docker-compose.yml down"
   
   makemigrations:
     desc: Create initial database migrations
@@ -57,7 +62,7 @@ tasks:
 
   format:
     desc: Format python source files
-    aliases: ["fmt"]
+    aliases: [ "fmt" ]
     cmds:
       - "{{.RUNNER}} ruff format {{ .SOURCES }}"
       - "{{.RUNNER}} ruff check --fix {{.SOURCES}}"
