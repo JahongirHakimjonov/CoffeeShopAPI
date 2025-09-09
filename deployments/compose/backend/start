@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+echo "[INFO] Running Alembic migrations..."
+uv run alembic upgrade head
+
+echo "[INFO] Starting project..."
+exec uvicorn app:create_app --proxy-headers --workers=2 --loop uvloop --http httptools --host 0.0.0.0 --port 8000 --factory

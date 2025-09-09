@@ -1,0 +1,115 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} || exit 1" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - internal
+
+
+  postgres-test:
+    image: postgres:16-alpine
+    ports:
+      - "25439:5432"
+    env_file:
+      - .env.test
+    networks:
+      - internal
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: .
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: /start
+    ports:
+      - ${APP_PORT:-8800}:8000
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    networks:
+      - internal
+
+  celery_worker:
+    build: .
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+    pull_policy: always
+    env_file:
+      - .env
+    command: /start-celeryworker
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - internal
+
+
+  celery_beat:
+    build: .
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+    pull_policy: always
+    env_file:
+      - .env
+    command: /start-celerybeat
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - internal
+
+
+  redis:
+    image: redis:8-alpine
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    expose:
+      - "6379"
+    networks:
+      - internal
+
+
+volumes:
+  postgres:
+
+networks:
+  internal:
+  bcraft_network:
+    external: true
